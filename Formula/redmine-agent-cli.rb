@@ -2,7 +2,6 @@ class RedmineAgentCli < Formula
   desc "Agent-first Redmine CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/redmine-cli"
   url "https://github.com/abigotado/redmine-cli/releases/download/v0.1.0/redmine-cli-0.1.0.tar.gz"
-  version "0.1.0"
   sha256 "a67a9c66e04ca83f0021db00a98c1e658625784ffdd733d7d0bd95871207e81b"
   license "MIT"
 
