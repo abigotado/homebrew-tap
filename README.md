@@ -4,7 +4,6 @@ Homebrew tap for [abigotado](https://github.com/abigotado)'s tools.
 
 ```bash
 brew install abigotado/tap/jira-agent-cli
-brew install --cask abigotado/tap/trello-cli
 ```
 
 `abigotado/tap` is shorthand for this repository — Homebrew expands it to
@@ -16,26 +15,28 @@ carries the `homebrew-` prefix.
 | Package | Type | Source | What it is |
 | --- | --- | --- | --- |
 | `jira-agent-cli` | Formula | [abigotado/jira-cli](https://github.com/abigotado/jira-cli) | Agent-first Jira Cloud CLI for Codex and Claude Code |
-| `trello-cli` | Cask | [abigotado/trello-cli](https://github.com/abigotado/trello-cli) | Manage Trello from the command line, or from an AI agent shelling out to it |
 
 The `jira-agent-cli` Formula builds locally from a checksummed source release
 and installs the `jira-cli` executable. It is macOS-only because credentials
 use the native Security.framework Keychain backend.
 
-The `trello-cli` Cask installs a prebuilt binary from the source project's
-GitHub release and verifies it against the SHA-256 recorded in the cask. macOS
-and Linux are both covered: `binary` is a portable cask artifact, so the same
-cask installs on Linuxbrew. Windows is not — use `go install` or the release
-archive.
+## Trello CLI migration
 
-## Generated Casks
+The old `trello-cli` Cask was retired because its downloaded macOS executable
+was unsigned and its install hook removed `com.apple.quarantine`. Existing
+installs are not removed automatically; uninstall one with:
 
-GoReleaser writes these files during the source project's release job and
-commits them here. **Do not edit a cask by hand:** the next release overwrites
-it, and a hand-edited SHA-256 breaks installation for everyone on that platform
-until the following release.
+```bash
+brew uninstall --cask trello-cli
+```
 
-Fix the source project's `.goreleaser.yaml` and cut a release instead.
+A macOS Formula will return after the native Security.framework backend is in a
+stable `trello-cli` tag. It will pin that tag's source archive by SHA-256 and
+compile locally instead of installing a downloaded executable. Until that tag
+exists, `go install github.com/abigotado/trello-cli/cmd/trello-cli@latest`
+still resolves to the previous stable release. To use the unreleased native
+backend after it merges, build the source project's `main` branch as documented
+in its README. Linux and Windows users can continue to use release archives.
 
 Formulae under `Formula/` are maintained and tested in this repository.
 
