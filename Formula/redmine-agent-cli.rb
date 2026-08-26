@@ -1,0 +1,86 @@
+class RedmineAgentCli < Formula
+  desc "Agent-first Redmine CLI with native macOS Keychain storage"
+  homepage "https://github.com/abigotado/redmine-cli"
+  url "https://github.com/abigotado/redmine-cli/releases/download/v0.1.0/redmine-cli-0.1.0.tar.gz"
+  sha256 "a67a9c66e04ca83f0021db00a98c1e658625784ffdd733d7d0bd95871207e81b"
+  license "MIT"
+
+  depends_on "go" => :build
+  depends_on :macos
+
+  resource "github.com/creack/pty" do
+    url "https://proxy.golang.org/github.com/creack/pty/@v/v1.1.24.zip"
+    sha256 "754e25253e76a5583b80d57d3add3afe68fc4d9f2a490968a9d1eda8c8fd8815"
+  end
+
+  resource "github.com/inconshreveable/mousetrap" do
+    url "https://proxy.golang.org/github.com/inconshreveable/mousetrap/@v/v1.1.0.zip"
+    sha256 "526674de624d7db108cfe7653ef110ccdfd97bc85026254224815567928ed243"
+  end
+
+  resource "github.com/spf13/cobra" do
+    url "https://proxy.golang.org/github.com/spf13/cobra/@v/v1.10.2.zip"
+    sha256 "a00aae6fcd631e0fde52c98604452ff70e1b73c3b8a560d68db15aff5e26872d"
+  end
+
+  resource "github.com/spf13/pflag" do
+    url "https://proxy.golang.org/github.com/spf13/pflag/@v/v1.0.9.zip"
+    sha256 "83910188d8735f84a48a80ab78351edac0b569896f2b3a244c696a07da9aa5ed"
+  end
+
+  resource "golang.org/x/sys" do
+    url "https://proxy.golang.org/golang.org/x/sys/@v/v0.44.0.zip"
+    sha256 "f1fa1052808e6bd6eb9c5372c053b2370a582532fac5d6a4600e7a6fab190ff3"
+  end
+
+  resource "golang.org/x/term" do
+    url "https://proxy.golang.org/golang.org/x/term/@v/v0.32.0.zip"
+    sha256 "e31f47c791e37f7dd1c12ad47015cf19f4a1903ac1792dacb724c5607e44c455"
+  end
+
+  def install
+    ENV["CGO_ENABLED"] = "1"
+    ENV["GOPROXY"] = "off"
+    ENV["GOSUMDB"] = "off"
+    ENV["GOTOOLCHAIN"] = "local"
+    ENV["GOFLAGS"] = "-mod=vendor -trimpath"
+    resource("github.com/creack/pty").stage do
+      (buildpath/"vendor/github.com/creack/pty").install Pathname("creack/pty@v1.1.24").children
+    end
+    resource("github.com/inconshreveable/mousetrap").stage do
+      module_root = Pathname("inconshreveable/mousetrap@v1.1.0")
+      (buildpath/"vendor/github.com/inconshreveable/mousetrap").install module_root.children
+    end
+    resource("github.com/spf13/cobra").stage do
+      (buildpath/"vendor/github.com/spf13/cobra").install Pathname("spf13/cobra@v1.10.2").children
+    end
+    resource("github.com/spf13/pflag").stage do
+      (buildpath/"vendor/github.com/spf13/pflag").install Pathname("spf13/pflag@v1.0.9").children
+    end
+    resource("golang.org/x/sys").stage do
+      (buildpath/"vendor/golang.org/x/sys").install Pathname("x/sys@v0.44.0").children
+    end
+    resource("golang.org/x/term").stage do
+      (buildpath/"vendor/golang.org/x/term").install Pathname("x/term@v0.32.0").children
+    end
+    (buildpath/"vendor").install "packaging/homebrew/modules.txt"
+    ldflags = "-X github.com/abigotado/redmine-cli/internal/cli.releaseVersion=v0.1.0"
+    system "go", "build", *std_go_args(output: bin/"redmine-cli", ldflags: ldflags), "./cmd/redmine-cli"
+  end
+
+  test do
+    version_response = JSON.parse(shell_output("#{bin}/redmine-cli version -o json"))
+    assert version_response["ok"]
+    assert_equal "v0.1.0", version_response.dig("data", "version")
+
+    contract_response = JSON.parse(shell_output("#{bin}/redmine-cli contract -o json"))
+    assert contract_response["ok"]
+    assert_equal 1, contract_response.dig("data", "envelope_version")
+
+    linkage = shell_output("/usr/bin/otool -L #{bin}/redmine-cli")
+    assert_match "/System/Library/Frameworks/Security.framework/", linkage
+
+    binary = File.binread(bin/"redmine-cli")
+    refute_match "/usr/bin/security", binary
+  end
+end

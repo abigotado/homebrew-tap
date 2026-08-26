@@ -4,6 +4,7 @@ Homebrew tap for [abigotado](https://github.com/abigotado)'s tools.
 
 ```bash
 brew install abigotado/tap/jira-agent-cli
+brew install abigotado/tap/redmine-agent-cli
 brew install abigotado/tap/trello-cli
 ```
 
@@ -16,9 +17,10 @@ carries the `homebrew-` prefix.
 | Package | Type | Source | What it is |
 | --- | --- | --- | --- |
 | `jira-agent-cli` | Formula | [abigotado/jira-cli](https://github.com/abigotado/jira-cli) | Agent-first Jira Cloud CLI for Codex and Claude Code |
+| `redmine-agent-cli` | Formula | [abigotado/redmine-cli](https://github.com/abigotado/redmine-cli) | Provider-neutral Redmine CLI and Agent Skill for Codex and Claude Code |
 | `trello-cli` | Formula | [abigotado/trello-cli](https://github.com/abigotado/trello-cli) | Agent-first Trello CLI for structured automation |
 
-Both Formulae build locally from checksummed source releases and are macOS-only
+All three Formulae build locally from checksummed source releases and are macOS-only
 because credentials use native Security.framework Keychain backends.
 
 ## Trello CLI migration
