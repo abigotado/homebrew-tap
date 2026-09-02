@@ -46,4 +46,4 @@ jobs:
         working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
         env:
           HOMEBREW_NO_AUTO_UPDATE: "1"
-        run: brew test slack-agent-cli
+        run: brew test abigotado/tap/slack-agent-cli
