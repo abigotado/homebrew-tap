@@ -1,8 +1,8 @@
 class SlackAgentCli < Formula
   desc "Provider-neutral Slack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/slack-agent-cli"
-  url "https://github.com/abigotado/slack-agent-cli/releases/download/v0.2.3/slack-agent-cli-0.2.3.tar.gz"
-  sha256 "824fed1e64e76f1832394ee439008810d56cedbc2b8a8347b09296cbb45d4ea4"
+  url "https://github.com/abigotado/slack-agent-cli/releases/download/v0.3.0/slack-agent-cli-0.3.0.tar.gz"
+  sha256 "cab5a8cdb5c62f400c1f07e5592840741dd6de9cadbc1d9dbc6d6e63cf00c8b5"
   license "MIT"
 
   depends_on "go" => :build
@@ -71,7 +71,7 @@ class SlackAgentCli < Formula
     assert version_response["ok"]
     assert_equal 1, version_response["v"]
     assert_equal "v#{version}", version_response.dig("data", "version")
-    assert_equal "f346da9ee93a50bee47a9c84b53debcf09735609", version_response.dig("data", "commit")
+    assert_equal "1be886ec41680c44cb86aa5d0d8036f5b664d4ce", version_response.dig("data", "commit")
 
     contract_response = JSON.parse(shell_output("#{bin}/slack-agent-cli contract"))
     assert contract_response["ok"]
