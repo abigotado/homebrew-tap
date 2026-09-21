@@ -18,7 +18,17 @@ concurrency:
 
 jobs:
   formula-validation:
-    name: Formula validation
+    name: Formula validation (${{ matrix.formula }})
+    strategy:
+      fail-fast: false
+      matrix:
+        formula:
+          - confluence-cli
+          - jira-agent-cli
+          - redmine-agent-cli
+          - slack-agent-cli
+          - trello-cli
+          - youtrack-agent-cli
     runs-on: macos-15
     steps:
       - name: Set up Homebrew
@@ -34,16 +44,16 @@ jobs:
         env:
           HOMEBREW_NO_AUTO_UPDATE: "1"
         run: |
-          brew style Formula/slack-agent-cli.rb
-          brew audit --strict --new --online abigotado/tap/slack-agent-cli
+          brew style "Formula/${{ matrix.formula }}.rb"
+          brew audit --strict --new --online "abigotado/tap/${{ matrix.formula }}"
           brew lgtm --online
       - name: Install from source
         working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
         env:
           HOMEBREW_NO_AUTO_UPDATE: "1"
-        run: brew install --formula --build-from-source abigotado/tap/slack-agent-cli
+        run: brew install --formula --build-from-source "abigotado/tap/${{ matrix.formula }}"
       - name: Test Formula
         working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
         env:
           HOMEBREW_NO_AUTO_UPDATE: "1"
-        run: brew test abigotado/tap/slack-agent-cli
+        run: brew test "abigotado/tap/${{ matrix.formula }}"
