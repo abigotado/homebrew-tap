@@ -2,10 +2,6 @@ name: Formula
 
 on:
   pull_request:
-    paths:
-      - "Formula/**"
-      - ".github/workflows/formula.yaml"
-      - "README.md"
   push:
     branches: [main]
 
@@ -57,3 +53,14 @@ jobs:
         env:
           HOMEBREW_NO_AUTO_UPDATE: "1"
         run: brew test "abigotado/tap/${{ matrix.formula }}"
+
+  formula-validation-result:
+    name: Formula validation
+    needs: formula-validation
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require all Formula checks
+        env:
+          RESULT: ${{ needs.formula-validation.result }}
+        run: test "$RESULT" = success
