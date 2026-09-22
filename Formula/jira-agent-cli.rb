@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Homebrew Formula for the standard macOS Jira CLI.
 class JiraAgentCli < Formula
   desc "Agent-first Jira Cloud CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/jira-cli"
