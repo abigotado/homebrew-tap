@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Homebrew Formula for the standard macOS Slack CLI.
 class SlackAgentCli < Formula
   desc "Provider-neutral Slack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/slack-agent-cli"

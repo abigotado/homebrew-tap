@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Homebrew Formula for the standard macOS Redmine CLI.
 class RedmineAgentCli < Formula
   desc "Agent-first Redmine CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/redmine-cli"

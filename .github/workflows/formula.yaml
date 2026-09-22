@@ -2,10 +2,6 @@ name: Formula
 
 on:
   pull_request:
-    paths:
-      - "Formula/**"
-      - ".github/workflows/formula.yaml"
-      - "README.md"
   push:
     branches: [main]
 
@@ -17,33 +13,57 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  formula-validation:
+  confluence:
+    name: Formula validation (confluence-cli)
+    uses: ./.github/workflows/formula-check.yaml
+    with:
+      formula: confluence-cli
+
+  jira:
+    name: Formula validation (jira-agent-cli)
+    uses: ./.github/workflows/formula-check.yaml
+    with:
+      formula: jira-agent-cli
+
+  redmine:
+    name: Formula validation (redmine-agent-cli)
+    uses: ./.github/workflows/formula-check.yaml
+    with:
+      formula: redmine-agent-cli
+
+  slack:
+    name: Formula validation (slack-agent-cli)
+    uses: ./.github/workflows/formula-check.yaml
+    with:
+      formula: slack-agent-cli
+
+  trello:
+    name: Formula validation (trello-cli)
+    uses: ./.github/workflows/formula-check.yaml
+    with:
+      formula: trello-cli
+
+  youtrack:
+    name: Formula validation (youtrack-agent-cli)
+    uses: ./.github/workflows/formula-check.yaml
+    with:
+      formula: youtrack-agent-cli
+
+  formula-validation-result:
     name: Formula validation
-    runs-on: macos-15
+    needs: [confluence, jira, redmine, slack, trello, youtrack]
+    if: always()
+    runs-on: ubuntu-latest
     steps:
-      - name: Set up Homebrew
-        id: set-up-homebrew
-        uses: Homebrew/actions/setup-homebrew@fd832223f9f99ebf0244dd20658680e5d4aca049 # 2026.08.03.2
-        with:
-          core: false
-          cask: false
-      - name: Install Homebrew test dependencies
-        run: brew install-bundler-gems --groups=style,audit,formula_test
-      - name: Audit Formula
-        working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
+      - name: Require all Formula checks
         env:
-          HOMEBREW_NO_AUTO_UPDATE: "1"
+          CONFLUENCE: ${{ needs.confluence.result }}
+          JIRA: ${{ needs.jira.result }}
+          REDMINE: ${{ needs.redmine.result }}
+          SLACK: ${{ needs.slack.result }}
+          TRELLO: ${{ needs.trello.result }}
+          YOUTRACK: ${{ needs.youtrack.result }}
         run: |
-          brew style Formula/slack-agent-cli.rb
-          brew audit --strict --new --online abigotado/tap/slack-agent-cli
-          brew lgtm --online
-      - name: Install from source
-        working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
-        env:
-          HOMEBREW_NO_AUTO_UPDATE: "1"
-        run: brew install --formula --build-from-source abigotado/tap/slack-agent-cli
-      - name: Test Formula
-        working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
-        env:
-          HOMEBREW_NO_AUTO_UPDATE: "1"
-        run: brew test abigotado/tap/slack-agent-cli
+          for result in "$CONFLUENCE" "$JIRA" "$REDMINE" "$SLACK" "$TRELLO" "$YOUTRACK"; do
+            test "$result" = success || exit 1
+          done

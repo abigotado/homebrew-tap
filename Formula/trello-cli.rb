@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Homebrew Formula for the standard macOS Trello CLI.
 class TrelloCli < Formula
   desc "Agent-first Trello CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/trello-cli"

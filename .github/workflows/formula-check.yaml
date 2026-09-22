@@ -1,0 +1,44 @@
+name: Formula check
+
+on:
+  workflow_call:
+    inputs:
+      formula:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  formula:
+    runs-on: macos-15
+    env:
+      FORMULA: ${{ inputs.formula }}
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@fd832223f9f99ebf0244dd20658680e5d4aca049 # 2026.08.03.2
+        with:
+          core: false
+          cask: false
+      - name: Install Homebrew test dependencies
+        run: brew install-bundler-gems --groups=style,audit,formula_test
+      - name: Audit Formula
+        working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: |
+          brew style "Formula/${FORMULA}.rb"
+          brew audit --strict --new --online "abigotado/tap/${FORMULA}"
+          brew lgtm --online
+      - name: Install from source
+        working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: brew install --formula --build-from-source "abigotado/tap/${FORMULA}"
+      - name: Test Formula
+        working-directory: ${{ steps.set-up-homebrew.outputs.repository-path }}
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: brew test "abigotado/tap/${FORMULA}"
