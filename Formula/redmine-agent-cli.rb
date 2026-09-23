@@ -1,11 +1,8 @@
-# frozen_string_literal: true
-
-# Homebrew Formula for the standard macOS Redmine CLI.
 class RedmineAgentCli < Formula
   desc "Agent-first Redmine CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/redmine-cli"
-  url "https://github.com/abigotado/redmine-cli/releases/download/v0.2.1/redmine-cli-0.2.1.tar.gz"
-  sha256 "330c8576940f426040ae5609d31d24f408a7d9bae6d142c2980373a643cb1919"
+  url "https://github.com/abigotado/redmine-cli/releases/download/v0.2.2/redmine-cli-0.2.2.tar.gz"
+  sha256 "6c08e7cfe1fd98685130e4fc9f1b0f8593e2e76cb876f1d03eaf9fe9ec38063b"
   license "MIT"
 
   depends_on "go" => :build
@@ -67,14 +64,14 @@ class RedmineAgentCli < Formula
       (buildpath/"vendor/golang.org/x/term").install Pathname("x/term@v0.32.0").children
     end
     (buildpath/"vendor").install "packaging/homebrew/modules.txt"
-    ldflags = "-X github.com/abigotado/redmine-cli/internal/cli.releaseVersion=v0.2.1"
+    ldflags = "-X github.com/abigotado/redmine-cli/internal/cli.releaseVersion=v0.2.2"
     system "go", "build", *std_go_args(output: bin/"redmine-cli", ldflags: ldflags), "./cmd/redmine-cli"
   end
 
   test do
     version_response = JSON.parse(shell_output("#{bin}/redmine-cli version -o json"))
     assert version_response["ok"]
-    assert_equal "v0.2.1", version_response.dig("data", "version")
+    assert_equal "v0.2.2", version_response.dig("data", "version")
 
     contract_response = JSON.parse(shell_output("#{bin}/redmine-cli contract -o json"))
     assert contract_response["ok"]
