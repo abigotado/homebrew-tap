@@ -4,8 +4,8 @@
 class YoutrackAgentCli < Formula
   desc "Agent-first JetBrains YouTrack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/youtrack-agent-cli"
-  url "https://github.com/abigotado/youtrack-agent-cli/archive/refs/tags/v0.1.2.tar.gz"
-  sha256 "c3080c32ff962ba4619a2a7b73d26b71f61230165246f4bdbff7f1776da8c795"
+  url "https://github.com/abigotado/youtrack-agent-cli/archive/refs/tags/v0.2.0.tar.gz"
+  sha256 "a94e5faecd3f240df017943230e83d31a58d50aec523706f3a952e90c01c8833"
   license "MIT"
 
   depends_on "go" => :build
@@ -88,8 +88,8 @@ class YoutrackAgentCli < Formula
       ## explicit; go 1.25.0
       golang.org/x/term
     EOS
-    commit = "55eef544a78f6a8b2ca3d692376a5c7f1fee6eef"
-    commit_time = "2026-09-22T21:04:49Z"
+    commit = "68fb4623bad25009a6e55bf664c47f473d1c6673"
+    commit_time = "2026-09-28T15:55:18Z"
     ldflags = %W[
       -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseVersion=v#{version}
       -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseCommit=#{commit}
@@ -105,8 +105,8 @@ class YoutrackAgentCli < Formula
     version_response = JSON.parse(shell_output(version_command))
     assert version_response["ok"]
     assert_equal "v#{version}", version_response.dig("data", "version")
-    assert_equal "55eef544a78f6a8b2ca3d692376a5c7f1fee6eef", version_response.dig("data", "commit")
-    assert_equal "2026-09-22T21:04:49Z", version_response.dig("data", "commit_time")
+    assert_equal "68fb4623bad25009a6e55bf664c47f473d1c6673", version_response.dig("data", "commit")
+    assert_equal "2026-09-28T15:55:18Z", version_response.dig("data", "commit_time")
 
     contract_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli contract -o json"))
     assert contract_response["ok"]
