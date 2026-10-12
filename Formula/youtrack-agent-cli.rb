@@ -4,8 +4,8 @@
 class YoutrackAgentCli < Formula
   desc "Agent-first JetBrains YouTrack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/youtrack-agent-cli"
-  url "https://github.com/abigotado/youtrack-agent-cli/archive/refs/tags/v0.2.0.tar.gz"
-  sha256 "a94e5faecd3f240df017943230e83d31a58d50aec523706f3a952e90c01c8833"
+  url "https://github.com/abigotado/youtrack-agent-cli/archive/refs/tags/v0.3.0.tar.gz"
+  sha256 "ca595840a92524932dc8b97ef694a07727cd2affc8636a0d8f8fffac6d70f4ad"
   license "MIT"
 
   depends_on "go" => :build
@@ -88,8 +88,8 @@ class YoutrackAgentCli < Formula
       ## explicit; go 1.25.0
       golang.org/x/term
     EOS
-    commit = "68fb4623bad25009a6e55bf664c47f473d1c6673"
-    commit_time = "2026-09-28T15:55:18Z"
+    commit = "1ae6fa16eef051f32538704c0595eaef53b69124"
+    commit_time = "2026-10-12T19:06:18Z"
     ldflags = %W[
       -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseVersion=v#{version}
       -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseCommit=#{commit}
@@ -105,8 +105,8 @@ class YoutrackAgentCli < Formula
     version_response = JSON.parse(shell_output(version_command))
     assert version_response["ok"]
     assert_equal "v#{version}", version_response.dig("data", "version")
-    assert_equal "68fb4623bad25009a6e55bf664c47f473d1c6673", version_response.dig("data", "commit")
-    assert_equal "2026-09-28T15:55:18Z", version_response.dig("data", "commit_time")
+    assert_equal "1ae6fa16eef051f32538704c0595eaef53b69124", version_response.dig("data", "commit")
+    assert_equal "2026-10-12T19:06:18Z", version_response.dig("data", "commit_time")
 
     contract_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli contract -o json"))
     assert contract_response["ok"]
@@ -115,6 +115,15 @@ class YoutrackAgentCli < Formula
     help = shell_output("#{bin}/youtrack-agent-cli --help")
     assert_match "auth", help
     assert_match "mutation", help
+
+    comments_help = shell_output("#{bin}/youtrack-agent-cli inspect comments --help")
+    assert_match "--id", comments_help
+    assert_match "--limit", comments_help
+    assert_match "--offset", comments_help
+
+    comments_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli inspect comments --id APP-1 -o json", 2))
+    refute comments_response["ok"]
+    assert_equal "PROFILE_REQUIRED", comments_response.dig("error", "code")
 
     linkage = shell_output("/usr/bin/otool -L #{bin}/youtrack-agent-cli")
     assert_match "/System/Library/Frameworks/Security.framework/", linkage
