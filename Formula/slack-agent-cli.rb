@@ -4,8 +4,8 @@
 class SlackAgentCli < Formula
   desc "Provider-neutral Slack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/slack-agent-cli"
-  url "https://github.com/abigotado/slack-agent-cli/releases/download/v0.3.0/slack-agent-cli-0.3.0.tar.gz"
-  sha256 "cab5a8cdb5c62f400c1f07e5592840741dd6de9cadbc1d9dbc6d6e63cf00c8b5"
+  url "https://github.com/abigotado/slack-agent-cli/releases/download/v0.3.1/slack-agent-cli-0.3.1.tar.gz"
+  sha256 "54efcd6418a58fa66234a6b9da408319b596892b21785c8da4c7aa1ed3e769e5"
   license "MIT"
 
   depends_on "go" => :build
@@ -74,7 +74,7 @@ class SlackAgentCli < Formula
     assert version_response["ok"]
     assert_equal 1, version_response["v"]
     assert_equal "v#{version}", version_response.dig("data", "version")
-    assert_equal "1be886ec41680c44cb86aa5d0d8036f5b664d4ce", version_response.dig("data", "commit")
+    assert_equal "4931351081249409d0861ad4e1ee6e6f29c977a3", version_response.dig("data", "commit")
 
     contract_response = JSON.parse(shell_output("#{bin}/slack-agent-cli contract"))
     assert contract_response["ok"]
@@ -87,6 +87,16 @@ class SlackAgentCli < Formula
     profile_required = JSON.parse(shell_output("#{bin}/slack-agent-cli me", 2))
     refute profile_required["ok"]
     assert_equal "PROFILE_REQUIRED", profile_required.dig("error", "code")
+
+    %w[history thread].each do |command|
+      help = shell_output("#{bin}/slack-agent-cli messages #{command} --help")
+      assert_match "page size 1-100 (default 50)", help
+      assert_match "every ok:false response exits nonzero", help
+
+      invalid_limit = JSON.parse(shell_output("#{bin}/slack-agent-cli messages #{command} --limit 0", 2))
+      refute invalid_limit["ok"]
+      assert_equal "INVALID_LIMIT", invalid_limit.dig("error", "code")
+    end
 
     linkage = shell_output("/usr/bin/otool -L #{bin}/slack-agent-cli")
     assert_match "/System/Library/Frameworks/Security.framework/", linkage
