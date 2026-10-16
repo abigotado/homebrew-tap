@@ -4,8 +4,8 @@
 class YoutrackAgentCli < Formula
   desc "Agent-first JetBrains YouTrack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/youtrack-agent-cli"
-  url "https://github.com/abigotado/youtrack-agent-cli/archive/refs/tags/v0.4.0.tar.gz"
-  sha256 "9ec29b12c1895e16594ee63feca6745e238fc58a963fca2695d713a525d47d57"
+  url "https://github.com/abigotado/youtrack-agent-cli/archive/refs/tags/v0.5.0.tar.gz"
+  sha256 "209658b1b64acf162ae85b854d8e1c39618b2fbd6ab21061ff47ed83fc788878"
   license "MIT"
 
   depends_on "go" => :build
@@ -88,8 +88,8 @@ class YoutrackAgentCli < Formula
       ## explicit; go 1.25.0
       golang.org/x/term
     EOS
-    commit = "c75d4cd97acf98f1f83512fb0b38ad3c91a2a024"
-    commit_time = "2026-10-13T19:56:58Z"
+    commit = "85bae131943d22080f1ba53618f32a2fccf1bcdd"
+    commit_time = "2026-10-16T17:48:15Z"
     ldflags = %W[
       -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseVersion=v#{version}
       -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseCommit=#{commit}
@@ -105,8 +105,8 @@ class YoutrackAgentCli < Formula
     version_response = JSON.parse(shell_output(version_command))
     assert version_response["ok"]
     assert_equal "v#{version}", version_response.dig("data", "version")
-    assert_equal "c75d4cd97acf98f1f83512fb0b38ad3c91a2a024", version_response.dig("data", "commit")
-    assert_equal "2026-10-13T19:56:58Z", version_response.dig("data", "commit_time")
+    assert_equal "85bae131943d22080f1ba53618f32a2fccf1bcdd", version_response.dig("data", "commit")
+    assert_equal "2026-10-16T17:48:15Z", version_response.dig("data", "commit_time")
 
     contract_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli contract -o json"))
     assert contract_response["ok"]
@@ -150,6 +150,21 @@ class YoutrackAgentCli < Formula
     comments_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli inspect comments --id APP-1 -o json", 2))
     refute comments_response["ok"]
     assert_equal "PROFILE_REQUIRED", comments_response.dig("error", "code")
+
+    defaults_help = shell_output("#{bin}/youtrack-agent-cli profile defaults set --help")
+    assert_match "--read", defaults_help
+    assert_match "--write", defaults_help
+
+    defaults_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli profile defaults show -o json"))
+    assert defaults_response["ok"]
+    assert_equal "unset", defaults_response.dig("data", "read", "state")
+    assert_equal "unset", defaults_response.dig("data", "write", "state")
+
+    clear_command = "#{bin}/youtrack-agent-cli profile defaults clear --read --write --dry-run -o json"
+    clear_response = JSON.parse(shell_output(clear_command))
+    assert clear_response["ok"]
+    assert_equal "unset", clear_response.dig("data", "read", "state")
+    assert_equal "unset", clear_response.dig("data", "write", "state")
 
     linkage = shell_output("/usr/bin/otool -L #{bin}/youtrack-agent-cli")
     assert_match "/System/Library/Frameworks/Security.framework/", linkage
