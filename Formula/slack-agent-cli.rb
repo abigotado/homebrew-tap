@@ -5,7 +5,7 @@ class SlackAgentCli < Formula
   desc "Provider-neutral Slack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/slack-agent-cli"
   url "https://github.com/abigotado/slack-agent-cli/releases/download/v0.3.2/slack-agent-cli-0.3.2.tar.gz"
-  sha256 "2a183cee6a377e69157d9724d158059f3da5d0df15b274e6c7e5aa85558d78b4"
+  sha256 "2b34604d8a43de13eea85a22332029018a1c995958f4309837d17a7ce58fb0dc"
   license "MIT"
 
   depends_on "go" => :build
