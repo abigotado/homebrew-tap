@@ -4,8 +4,8 @@
 class YoutrackAgentCli < Formula
   desc "Agent-first JetBrains YouTrack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/youtrack-agent-cli"
-  url "https://github.com/abigotado/youtrack-agent-cli/archive/refs/tags/v0.5.0.tar.gz"
-  sha256 "209658b1b64acf162ae85b854d8e1c39618b2fbd6ab21061ff47ed83fc788878"
+  url "https://github.com/abigotado/youtrack-agent-cli/archive/refs/tags/v0.6.0.tar.gz"
+  sha256 "015f55625e5f6ef4856b440f61c5517a0ee90d1a506d7b49388df27df93c09fb"
   license "MIT"
 
   depends_on "go" => :build
@@ -88,8 +88,8 @@ class YoutrackAgentCli < Formula
       ## explicit; go 1.25.0
       golang.org/x/term
     EOS
-    commit = "85bae131943d22080f1ba53618f32a2fccf1bcdd"
-    commit_time = "2026-10-16T17:48:15Z"
+    commit = "4976304151dd7353411a2dc2d41d3fe93f881075"
+    commit_time = "2026-10-30T22:26:57Z"
     ldflags = %W[
       -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseVersion=v#{version}
       -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseCommit=#{commit}
@@ -105,8 +105,8 @@ class YoutrackAgentCli < Formula
     version_response = JSON.parse(shell_output(version_command))
     assert version_response["ok"]
     assert_equal "v#{version}", version_response.dig("data", "version")
-    assert_equal "85bae131943d22080f1ba53618f32a2fccf1bcdd", version_response.dig("data", "commit")
-    assert_equal "2026-10-16T17:48:15Z", version_response.dig("data", "commit_time")
+    assert_equal "4976304151dd7353411a2dc2d41d3fe93f881075", version_response.dig("data", "commit")
+    assert_equal "2026-10-30T22:26:57Z", version_response.dig("data", "commit_time")
 
     contract_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli contract -o json"))
     assert contract_response["ok"]
@@ -132,6 +132,19 @@ class YoutrackAgentCli < Formula
     operator_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli operator-write apply -o json", 2))
     refute operator_response["ok"]
     assert_equal "PROFILE_REQUIRED", operator_response.dig("error", "code")
+
+    snapshot_help = shell_output("#{bin}/youtrack-agent-cli operator-write snapshot --help")
+    assert_match "issue.create", snapshot_help
+    assert_match "--project", snapshot_help
+
+    create_command = %W[
+      #{bin}/youtrack-agent-cli operator-write snapshot --kind issue.create
+      --project TAC --out #{testpath}/snapshot.json -o json
+    ].join(" ")
+    create_response = JSON.parse(shell_output(create_command, 2))
+    refute create_response["ok"]
+    assert_equal "PROFILE_REQUIRED", create_response.dig("error", "code")
+    refute_path_exists testpath/"snapshot.json"
 
     native_command = %W[
       #{bin}/youtrack-agent-cli mutation apply --profile test
