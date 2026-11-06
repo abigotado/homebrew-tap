@@ -3,9 +3,9 @@
 # Homebrew Formula for the standard macOS YouTrack CLI.
 class YoutrackAgentCli < Formula
   desc "Agent-first JetBrains YouTrack CLI with native macOS Keychain storage"
-  homepage "https://github.com/abigotado/youtrack-agent-cli"
-  url "https://github.com/abigotado/youtrack-agent-cli/archive/refs/tags/v0.9.0.tar.gz"
-  sha256 "4235d7af14dfa76fee6ad43172983fcff249859cabf477390b3bc6d05a6d3780"
+  homepage "https://github.com/abigotado/agent-clis"
+  url "https://github.com/abigotado/agent-clis/archive/refs/tags/v0.9.0.tar.gz"
+  sha256 "c27997a75151b4cdf8c4c453a061090074b08fd95eb52add4a35cb048feed578"
   license "MIT"
 
   depends_on "go" => :build
