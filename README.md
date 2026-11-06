@@ -24,7 +24,7 @@ carries the `homebrew-` prefix.
 | `redmine-agent-cli` | Formula | [abigotado/redmine-cli](https://github.com/abigotado/redmine-cli) | Provider-neutral Redmine CLI and Agent Skill for Codex and Claude Code |
 | `slack-agent-cli` | Formula | [abigotado/slack-agent-cli](https://github.com/abigotado/slack-agent-cli) | Provider-neutral Slack CLI and Agent Skill for Codex and Claude Code |
 | `trello-cli` | Formula | [abigotado/trello-cli](https://github.com/abigotado/trello-cli) | Agent-first Trello CLI for structured automation |
-| `youtrack-agent-cli` | Formula | [abigotado/youtrack-agent-cli](https://github.com/abigotado/youtrack-agent-cli) | Agent-first JetBrains YouTrack CLI for Codex and Claude Code |
+| `youtrack-agent-cli` | Formula | [abigotado/agent-clis](https://github.com/abigotado/agent-clis) | Agent-first JetBrains YouTrack CLI for Codex and Claude Code |
 
 All six Formulae build locally from checksummed source releases and are macOS-only
 because credentials use native Security.framework Keychain backends.
