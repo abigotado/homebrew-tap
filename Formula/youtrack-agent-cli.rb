@@ -4,8 +4,8 @@
 class YoutrackAgentCli < Formula
   desc "Agent-first JetBrains YouTrack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/agent-clis"
-  url "https://github.com/abigotado/agent-clis/archive/refs/tags/v0.9.0.tar.gz"
-  sha256 "c27997a75151b4cdf8c4c453a061090074b08fd95eb52add4a35cb048feed578"
+  url "https://github.com/abigotado/agent-clis/archive/refs/tags/youtrack-agent-cli/v0.10.0.tar.gz"
+  sha256 "4e4d8d179918d809b3ea8d24b8943e16a2e14c8918cd5393cb2def57985bd279"
   license "MIT"
 
   depends_on "go" => :build
@@ -48,25 +48,25 @@ class YoutrackAgentCli < Formula
     ENV["GOTOOLCHAIN"] = "local"
     ENV["GOFLAGS"] = "-mod=vendor -trimpath"
     resource("github.com/creack/pty").stage do
-      (buildpath/"vendor/github.com/creack/pty").install Pathname("creack/pty@v1.1.24").children
+      (buildpath/"youtrack-agent-cli/vendor/github.com/creack/pty").install Pathname("creack/pty@v1.1.24").children
     end
     resource("github.com/inconshreveable/mousetrap").stage do
       module_root = Pathname("inconshreveable/mousetrap@v1.1.0")
-      (buildpath/"vendor/github.com/inconshreveable/mousetrap").install module_root.children
+      (buildpath/"youtrack-agent-cli/vendor/github.com/inconshreveable/mousetrap").install module_root.children
     end
     resource("github.com/spf13/cobra").stage do
-      (buildpath/"vendor/github.com/spf13/cobra").install Pathname("spf13/cobra@v1.10.2").children
+      (buildpath/"youtrack-agent-cli/vendor/github.com/spf13/cobra").install Pathname("spf13/cobra@v1.10.2").children
     end
     resource("github.com/spf13/pflag").stage do
-      (buildpath/"vendor/github.com/spf13/pflag").install Pathname("spf13/pflag@v1.0.10").children
+      (buildpath/"youtrack-agent-cli/vendor/github.com/spf13/pflag").install Pathname("spf13/pflag@v1.0.10").children
     end
     resource("golang.org/x/sys").stage do
-      (buildpath/"vendor/golang.org/x/sys").install Pathname("x/sys@v0.49.0").children
+      (buildpath/"youtrack-agent-cli/vendor/golang.org/x/sys").install Pathname("x/sys@v0.49.0").children
     end
     resource("golang.org/x/term").stage do
-      (buildpath/"vendor/golang.org/x/term").install Pathname("x/term@v0.47.0").children
+      (buildpath/"youtrack-agent-cli/vendor/golang.org/x/term").install Pathname("x/term@v0.47.0").children
     end
-    (buildpath/"vendor/modules.txt").write <<~EOS
+    (buildpath/"youtrack-agent-cli/vendor/modules.txt").write <<~EOS
       # github.com/creack/pty v1.1.24
       ## explicit; go 1.18
       github.com/creack/pty
@@ -88,14 +88,17 @@ class YoutrackAgentCli < Formula
       ## explicit; go 1.25.0
       golang.org/x/term
     EOS
-    commit = "3f38b038a15cab001767430316ecd0f0db079cf9"
-    commit_time = "2026-11-05T19:55:50Z"
+    commit = "b364959e7a8d49493d8685188b2bbe274eef1e3f"
+    commit_time = "2026-11-11T14:37:28Z"
     ldflags = %W[
-      -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseVersion=v#{version}
-      -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseCommit=#{commit}
-      -X github.com/abigotado/youtrack-agent-cli/internal/cli.releaseCommitTime=#{commit_time}
+      -X github.com/abigotado/agent-clis/youtrack-agent-cli/internal/cli.releaseVersion=v#{version}
+      -X github.com/abigotado/agent-clis/youtrack-agent-cli/internal/cli.releaseCommit=#{commit}
+      -X github.com/abigotado/agent-clis/youtrack-agent-cli/internal/cli.releaseCommitTime=#{commit_time}
     ].join(" ")
-    system "go", "build", *std_go_args(output: bin/"youtrack-agent-cli", ldflags: ldflags), "./cmd/youtrack-agent-cli"
+    cd "youtrack-agent-cli" do
+      system "go", "build", *std_go_args(output: bin/"youtrack-agent-cli", ldflags: ldflags),
+             "./cmd/youtrack-agent-cli"
+    end
   end
 
   test do
@@ -105,8 +108,8 @@ class YoutrackAgentCli < Formula
     version_response = JSON.parse(shell_output(version_command))
     assert version_response["ok"]
     assert_equal "v#{version}", version_response.dig("data", "version")
-    assert_equal "3f38b038a15cab001767430316ecd0f0db079cf9", version_response.dig("data", "commit")
-    assert_equal "2026-11-05T19:55:50Z", version_response.dig("data", "commit_time")
+    assert_equal "b364959e7a8d49493d8685188b2bbe274eef1e3f", version_response.dig("data", "commit")
+    assert_equal "2026-11-11T14:37:28Z", version_response.dig("data", "commit_time")
 
     contract_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli contract -o json"))
     assert contract_response["ok"]
@@ -123,9 +126,10 @@ class YoutrackAgentCli < Formula
     assert_equal false, capabilities.dig("data", "native_user_presence_supported")
     assert_equal false, capabilities.dig("data", "locally_ready")
     assert_equal "operator_confirmed", capabilities.dig("data", "confirmation_mode")
-    assert_equal 3, capabilities.dig("data", "plan_version")
+    assert_equal 4, capabilities.dig("data", "plan_version")
     assert_equal 2, capabilities.dig("data", "plan_versions", "issue.create")
-    assert_equal 2, capabilities.dig("data", "plan_versions", "issue.update")
+    assert_equal 4, capabilities.dig("data", "plan_versions", "issue.update")
+    assert_equal 4, capabilities.dig("data", "plan_versions", "issue.edit")
     assert_equal 2, capabilities.dig("data", "plan_versions", "comment.add")
     assert_equal 3, capabilities.dig("data", "plan_versions", "comment.delete")
     assert_equal "until_consumed_or_stale", capabilities.dig("data", "plan_lifetime")
@@ -141,6 +145,7 @@ class YoutrackAgentCli < Formula
 
     snapshot_help = shell_output("#{bin}/youtrack-agent-cli operator-write snapshot --help")
     assert_match "issue.create", snapshot_help
+    assert_match "issue.edit", snapshot_help
     assert_match "comment.delete", snapshot_help
     assert_match "--comment-id", snapshot_help
     assert_match "--project", snapshot_help
