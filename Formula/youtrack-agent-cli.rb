@@ -8,6 +8,11 @@ class YoutrackAgentCli < Formula
   sha256 "4e4d8d179918d809b3ea8d24b8943e16a2e14c8918cd5393cb2def57985bd279"
   license "MIT"
 
+  livecheck do
+    url :stable
+    regex(%r{^youtrack-agent-cli/v?(\d+(?:\.\d+)+)$}i)
+  end
+
   depends_on "go" => :build
   depends_on :macos
 
@@ -46,6 +51,7 @@ class YoutrackAgentCli < Formula
     ENV["GOPROXY"] = "off"
     ENV["GOSUMDB"] = "off"
     ENV["GOTOOLCHAIN"] = "local"
+    ENV["GOWORK"] = "off"
     ENV["GOFLAGS"] = "-mod=vendor -trimpath"
     resource("github.com/creack/pty").stage do
       (buildpath/"youtrack-agent-cli/vendor/github.com/creack/pty").install Pathname("creack/pty@v1.1.24").children
