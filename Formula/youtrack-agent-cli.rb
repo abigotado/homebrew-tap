@@ -4,8 +4,8 @@
 class YoutrackAgentCli < Formula
   desc "Agent-first JetBrains YouTrack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/agent-clis"
-  url "https://github.com/abigotado/agent-clis/archive/refs/tags/youtrack-agent-cli/v0.10.0.tar.gz"
-  sha256 "4e4d8d179918d809b3ea8d24b8943e16a2e14c8918cd5393cb2def57985bd279"
+  url "https://github.com/abigotado/agent-clis/archive/refs/tags/youtrack-agent-cli/v0.11.0.tar.gz"
+  sha256 "efce396562d4a322b9240323740d9ad23f592cf59bdcdbae024a29b0f14bfcb8"
   license "MIT"
 
   livecheck do
@@ -94,8 +94,8 @@ class YoutrackAgentCli < Formula
       ## explicit; go 1.25.0
       golang.org/x/term
     EOS
-    commit = "b364959e7a8d49493d8685188b2bbe274eef1e3f"
-    commit_time = "2026-11-11T14:37:28Z"
+    commit = "14393120af3e8af89c5ebd255dd8eb8044fc2c08"
+    commit_time = "2026-11-12T18:46:13Z"
     ldflags = %W[
       -X github.com/abigotado/agent-clis/youtrack-agent-cli/internal/cli.releaseVersion=v#{version}
       -X github.com/abigotado/agent-clis/youtrack-agent-cli/internal/cli.releaseCommit=#{commit}
@@ -114,8 +114,8 @@ class YoutrackAgentCli < Formula
     version_response = JSON.parse(shell_output(version_command))
     assert version_response["ok"]
     assert_equal "v#{version}", version_response.dig("data", "version")
-    assert_equal "b364959e7a8d49493d8685188b2bbe274eef1e3f", version_response.dig("data", "commit")
-    assert_equal "2026-11-11T14:37:28Z", version_response.dig("data", "commit_time")
+    assert_equal "14393120af3e8af89c5ebd255dd8eb8044fc2c08", version_response.dig("data", "commit")
+    assert_equal "2026-11-12T18:46:13Z", version_response.dig("data", "commit_time")
 
     contract_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli contract -o json"))
     assert contract_response["ok"]
@@ -133,9 +133,11 @@ class YoutrackAgentCli < Formula
     assert_equal false, capabilities.dig("data", "locally_ready")
     assert_equal "operator_confirmed", capabilities.dig("data", "confirmation_mode")
     assert_equal 4, capabilities.dig("data", "plan_version")
-    assert_equal 2, capabilities.dig("data", "plan_versions", "issue.create")
+    assert_equal 4, capabilities.dig("data", "plan_versions", "issue.create")
     assert_equal 4, capabilities.dig("data", "plan_versions", "issue.update")
     assert_equal 4, capabilities.dig("data", "plan_versions", "issue.edit")
+    assert_equal 4, capabilities.dig("data", "plan_versions", "issue.link")
+    assert_equal 4, capabilities.dig("data", "plan_versions", "attachment.add")
     assert_equal 2, capabilities.dig("data", "plan_versions", "comment.add")
     assert_equal 3, capabilities.dig("data", "plan_versions", "comment.delete")
     assert_equal "until_consumed_or_stale", capabilities.dig("data", "plan_lifetime")
@@ -155,6 +157,8 @@ class YoutrackAgentCli < Formula
     assert_match "comment.delete", snapshot_help
     assert_match "--comment-id", snapshot_help
     assert_match "--project", snapshot_help
+    assert_match "attachment.add", snapshot_help
+    assert_match "--file", snapshot_help
 
     create_command = %W[
       #{bin}/youtrack-agent-cli operator-write snapshot --kind issue.create
