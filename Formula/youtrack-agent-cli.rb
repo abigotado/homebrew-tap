@@ -4,8 +4,8 @@
 class YoutrackAgentCli < Formula
   desc "Agent-first JetBrains YouTrack CLI with native macOS Keychain storage"
   homepage "https://github.com/abigotado/agent-clis"
-  url "https://github.com/abigotado/agent-clis/archive/refs/tags/youtrack-agent-cli/v0.11.0.tar.gz"
-  sha256 "efce396562d4a322b9240323740d9ad23f592cf59bdcdbae024a29b0f14bfcb8"
+  url "https://github.com/abigotado/agent-clis/archive/refs/tags/youtrack-agent-cli/v0.12.0.tar.gz"
+  sha256 "d35a63cdd511307860a354164e4aec69110ed2508bdecc9bf245e02fafeafcc3"
   license "MIT"
 
   livecheck do
@@ -94,8 +94,8 @@ class YoutrackAgentCli < Formula
       ## explicit; go 1.25.0
       golang.org/x/term
     EOS
-    commit = "14393120af3e8af89c5ebd255dd8eb8044fc2c08"
-    commit_time = "2026-11-12T18:46:13Z"
+    commit = "854bd0f89cbec648470d5c35659b2ec7277273e2"
+    commit_time = "2026-11-13T19:00:45Z"
     ldflags = %W[
       -X github.com/abigotado/agent-clis/youtrack-agent-cli/internal/cli.releaseVersion=v#{version}
       -X github.com/abigotado/agent-clis/youtrack-agent-cli/internal/cli.releaseCommit=#{commit}
@@ -114,8 +114,8 @@ class YoutrackAgentCli < Formula
     version_response = JSON.parse(shell_output(version_command))
     assert version_response["ok"]
     assert_equal "v#{version}", version_response.dig("data", "version")
-    assert_equal "14393120af3e8af89c5ebd255dd8eb8044fc2c08", version_response.dig("data", "commit")
-    assert_equal "2026-11-12T18:46:13Z", version_response.dig("data", "commit_time")
+    assert_equal "854bd0f89cbec648470d5c35659b2ec7277273e2", version_response.dig("data", "commit")
+    assert_equal "2026-11-13T19:00:45Z", version_response.dig("data", "commit_time")
 
     contract_response = JSON.parse(shell_output("#{bin}/youtrack-agent-cli contract -o json"))
     assert contract_response["ok"]
@@ -132,13 +132,13 @@ class YoutrackAgentCli < Formula
     assert_equal false, capabilities.dig("data", "native_user_presence_supported")
     assert_equal false, capabilities.dig("data", "locally_ready")
     assert_equal "operator_confirmed", capabilities.dig("data", "confirmation_mode")
-    assert_equal 4, capabilities.dig("data", "plan_version")
-    assert_equal 4, capabilities.dig("data", "plan_versions", "issue.create")
+    assert_equal 5, capabilities.dig("data", "plan_version")
+    assert_equal 5, capabilities.dig("data", "plan_versions", "issue.create")
     assert_equal 4, capabilities.dig("data", "plan_versions", "issue.update")
     assert_equal 4, capabilities.dig("data", "plan_versions", "issue.edit")
     assert_equal 4, capabilities.dig("data", "plan_versions", "issue.link")
     assert_equal 4, capabilities.dig("data", "plan_versions", "attachment.add")
-    assert_equal 2, capabilities.dig("data", "plan_versions", "comment.add")
+    assert_equal 5, capabilities.dig("data", "plan_versions", "comment.add")
     assert_equal 3, capabilities.dig("data", "plan_versions", "comment.delete")
     assert_equal "until_consumed_or_stale", capabilities.dig("data", "plan_lifetime")
     assert_equal "local_configuration_only", capabilities.dig("data", "readiness_scope")
